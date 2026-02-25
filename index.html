@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <title>Transformer Architecture &#8212; Complete Interactive Guide</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+
+</head>
+
+<body>
+
+  <div id="nav">
+
+    <div class="nav-logo">
+      <h1>&#9889; Transformer Guide</h1>
+      <p>Full Interactive Learning</p>
+    </div>
+
+    <h2>Architecture</h2>
+
+    <div class="nav-item active" onclick="goto('overview')"><span class="nav-icon">&#127758;</span>Overview</div>
+
+    <div class="nav-item" onclick="goto('embed')"><span class="nav-icon">&#128288;</span>Embeddings + PE</div>
+
+    <h2>Attention</h2>
+
+    <div class="nav-item" onclick="goto('sdpa')"><span class="nav-icon">&#127919;</span>Scaled Dot-Product</div>
+
+    <div class="nav-item" onclick="goto('single')"><span class="nav-icon">&#128065;</span>Single-Head Attention</div>
+
+    <div class="nav-item" onclick="goto('multi')"><span class="nav-icon">&#129504;</span>Multi-Head Attention</div>
+
+    <div class="nav-item" onclick="goto('masked')"><span class="nav-icon">&#128274;</span>Masked Attention</div>
+
+    <div class="nav-item" onclick="goto('cross')"><span class="nav-icon">&#128279;</span>Cross-Attention</div>
+
+    <h2>Blocks</h2>
+
+    <div class="nav-item" onclick="goto('ffn')"><span class="nav-icon">&#9881;</span>Feed-Forward + LN</div>
+
+    <div class="nav-item" onclick="goto('encoder')"><span class="nav-icon">&#128442;</span>Encoder Block</div>
+
+    <div class="nav-item" onclick="goto('decoder')"><span class="nav-icon">&#128452;</span>Decoder Block</div>
+
+    <h2>Training</h2>
+
+    <div class="nav-item" onclick="goto('train')"><span class="nav-icon">&#128200;</span>Loss + Masking</div>
+
+    <h2>Learn More</h2>
+
+    <div class="nav-item" onclick="goto('glossary')"><span class="nav-icon">&#128218;</span>Glossary</div>
+
+    <div class="nav-item" onclick="goto('qa')"><span class="nav-icon">&#128172;</span>Ask a Question</div>
+
+  </div>
+
+  <div id="main">
+
+
+
+    <!-- =========================================================
+
+     SECTION 0: OVERVIEW
+
+     ========================================================= -->
+
+    <div id="s-overview" class="section active">
+
+      <h2 class="sec-title">Transformer Architecture <span class="badge">Full Map</span></h2>
+
+      <p class="sec-desc">The Transformer (Vaswani et al. 2017) revolutionised NLP. It relies entirely on attention
+        &#8212; no recurrence, no convolutions. Click any block to jump to its live demo.</p>
+
+      <div class="explainer">
+        <button class="explainer-toggle" onclick="toggleExplainer('exp-overview')">
+          <span class="etoggle-icon">&#128214;</span> Beginner Explanation &#8212; What is a Transformer?
+          <span class="earrow">&#9660;</span>
+        </button>
+        <div class="explainer-body" id="exp-overview">
+          <div class="explainer-inner">
+            <h4>&#129300; What is a Transformer?</h4>
+            <p>A <strong>Transformer</strong> is a type of neural network architecture designed to process sequences of
+              data (like words in a sentence). It was introduced in the landmark 2017 paper <em>"Attention Is All You
+                Need"</em> by Google researchers.</p>
+            <p>Before Transformers, models like RNNs and LSTMs processed words <em>one at a time</em>, making them slow
+              and bad at long-range dependencies. Transformers process <em>all words at once</em> in parallel, using a
+              mechanism called <strong>attention</strong>.</p>
+            <div class="e-analogy">&#128161; <strong>Analogy:</strong> Imagine reading a book. An RNN reads word-by-word
+              like someone with no memory. A Transformer reads the whole page at once and can instantly see how any word
+              relates to any other word — like a speed reader who understands context immediately.</div>
+            <h4>&#127775; Why does it matter?</h4>
+            <div class="e-why">Transformers power GPT-4, Gemini, BERT, PaLM, and virtually every state-of-the-art
+              language model. Understanding Transformers = understanding modern AI.</div>
+            <h4>&#127358; The Two Halves</h4>
+            <ul>
+              <li><strong>Encoder</strong>: Reads the input and builds a rich understanding of it (used in BERT,
+                translation source).</li>
+              <li><strong>Decoder</strong>: Generates the output token by token, using the encoder's understanding (used
+                in GPT, translation target).</li>
+            </ul>
+            <p>Some models use only the encoder (BERT), some only the decoder (GPT), and some use both (original
+              Transformer for translation).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="row2">
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--ac)"></div>Encoder Pathway
+          </div>
+
+          <div class="arch">
+
+            <div class="arch-block" style="background:rgba(124,111,255,.15);border:1px solid var(--ac)"
+              onclick="goto('embed')">Input Embedding + PE</div>
+
+            <div class="arch-arrow">&#8595;</div>
+
+            <div class="arch-block" style="background:rgba(167,139,250,.12);border:1px solid var(--q)"
+              onclick="goto('single')">Multi-Head Self-Attention</div>
+
+            <div class="arch-arrow">&#8595;</div>
+
+            <div class="arch-block" style="background:rgba(52,211,153,.1);border:1px solid var(--k)"
+              onclick="goto('ffn')">Add &amp; Norm + FFN</div>
+
+            <div class="arch-arrow">&#8595;</div>
+
+            <div class="arch-block" style="background:rgba(56,217,169,.15);border:1px solid var(--ac2)">Encoder Output
+              (Context)</div>
+
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--ac2)"></div>Decoder Pathway
+          </div>
+
+          <div class="arch">
+
+            <div class="arch-block" style="background:rgba(124,111,255,.15);border:1px solid var(--ac)"
+              onclick="goto('embed')">Output Embedding + PE</div>
+
+            <div class="arch-arrow">&#8595;</div>
+
+            <div class="arch-block" style="background:rgba(244,63,94,.12);border:1px solid var(--r)"
+              onclick="goto('masked')">Masked Self-Attention</div>
+
+            <div class="arch-arrow">&#8595;</div>
+
+            <div class="arch-block" style="background:rgba(167,139,250,.12);border:1px solid var(--q)"
+              onclick="goto('cross')">Cross-Attention (Enc&#8594;Dec)</div>
+
+            <div class="arch-arrow">&#8595;</div>
+
+            <div class="arch-block" style="background:rgba(52,211,153,.1);border:1px solid var(--k)"
+              onclick="goto('ffn')">Add &amp; Norm + FFN</div>
+
+            <div class="arch-arrow">&#8595;</div>
+
+            <div class="arch-block" style="background:rgba(249,115,22,.15);border:1px solid var(--ac3)"
+              onclick="goto('train')">Linear + Softmax &#8594; Token</div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <div class="card-title">
+          <div class="dot" style="background:var(--ac3)"></div>Key Concepts
+        </div>
+
+        <div class="concept-grid" id="concept-grid"></div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+
+     SECTION 1: EMBEDDINGS + PE
+
+     ========================================================= -->
+
+    <div id="s-embed" class="section">
+
+      <h2 class="sec-title">Token Embeddings <span class="badge">+ Positional Encoding</span></h2>
+
+      <p class="sec-desc">Each token is mapped to a d_model-dimensional vector. Since Transformers have no notion of
+        order, we ADD a positional encoding to inject position information.</p>
+
+      <div class="explainer">
+        <button class="explainer-toggle" onclick="toggleExplainer('exp-embed')">
+          <span class="etoggle-icon">&#128214;</span> Beginner Explanation &#8212; Embeddings &amp; Positional Encoding
+          <span class="earrow">&#9660;</span>
+        </button>
+        <div class="explainer-body" id="exp-embed">
+          <div class="explainer-inner">
+            <h4>&#129522; What is a Token?</h4>
+            <p>Text is split into <strong>tokens</strong> — roughly, words or sub-words. For example, "unhappiness"
+              might become <code>["un", "happiness"]</code>. Each token gets a unique integer ID from a vocabulary.</p>
+            <h4>&#128288; What is an Embedding?</h4>
+            <p>An <strong>embedding</strong> turns each token ID into a list of numbers (a vector) with
+              <code>d_model</code> dimensions (e.g. 512 numbers). These numbers are <em>learned</em> during training so
+              that similar words end up with similar vectors.</p>
+            <div class="e-analogy">&#128161; <strong>Analogy:</strong> Think of coordinates on a map. "cat" and "dog"
+              would be close together (both animals), but far from "car". Embeddings are like GPS coordinates for
+              meaning.</div>
+            <h4>&#128204; Why Positional Encoding?</h4>
+            <p>Transformers process all tokens simultaneously. Without extra information, the model can't tell whether
+              "cat" came first or last in the sentence. <strong>Positional Encoding</strong> adds a unique pattern to
+              each position so the model knows the order.</p>
+            <div class="e-eq">PE(pos, 2i) = sin(pos / 10000^(2i/d_model))
+              PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))</div>
+            <p>The sine/cosine patterns give each position a unique "fingerprint" that the model can learn to interpret.
+              Final input = <strong>Embedding + Positional Encoding</strong>.</p>
+            <div class="e-why">&#9889; Key insight: Even dimensions use <strong>sine</strong>, odd dimensions use
+              <strong>cosine</strong>. This lets the model compute relative positions ("word A is 3 positions before
+              word B") from simple arithmetic on the encodings.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+
+        <div class="card-title">
+          <div class="dot" style="background:var(--ac)"></div>Live Demo
+        </div>
+
+        <div class="irow">
+
+          <input id="pe-sent" class="inp" style="max-width:320px" value="hello world" oninput="renderPE()" />
+
+          <div class="sl-g"><label>d_model <span class="sv" id="pe-dm-v">16</span></label><input type="range" id="pe-dm"
+              min="4" max="32" step="4" value="16"
+              oninput="document.getElementById('pe-dm-v').textContent=this.value;renderPE()" /></div>
+
+        </div>
+
+        <div class="row2">
+
+          <div>
+            <div class="card-title">
+              <div class="dot" style="background:var(--q)"></div>Token Embedding
+            </div>
+            <div id="pe-emb-tbl" style="overflow-x:auto"></div>
+          </div>
+
+          <div>
+            <div class="card-title">
+              <div class="dot" style="background:var(--k)"></div>Positional Encoding
+            </div>
+            <div id="pe-pos-tbl" style="overflow-x:auto"></div>
+          </div>
+
+        </div>
+
+        <div class="card-title" style="margin-top:14px">
+          <div class="dot" style="background:var(--ac2)"></div>Embedding + PE (Input to Encoder)
+        </div>
+
+        <div id="pe-final-tbl" style="overflow-x:auto"></div>
+
+      </div>
+
+      <div class="row2">
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--ac3)"></div>PE Formula
+          </div>
+
+          <div class="formula">PE(pos, 2i) = sin(pos / 10000^(2i/d))<br>PE(pos, 2i+1) = cos(pos / 10000^(2i/d))</div>
+
+          <div class="info">Even dimensions use <strong>sine</strong>, odd use <strong>cosine</strong>. Each position
+            gets a unique pattern that the model can use to detect relative positions.</div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--ac2)"></div>PE Heatmap (positions &times; dims)
+          </div>
+
+          <canvas id="pe-canvas" height="140"></canvas>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+
+     SECTION 2: SCALED DOT-PRODUCT
+
+     ========================================================= -->
+
+    <div id="s-sdpa" class="section">
+
+      <h2 class="sec-title">Scaled Dot-Product Attention <span class="badge">Core</span></h2>
+
+      <p class="sec-desc">The fundamental operation inside every attention layer. Given Q, K, V matrices it computes
+        attention scores, applies softmax, and returns a weighted sum of values.</p>
+
+      <div class="explainer">
+        <button class="explainer-toggle" onclick="toggleExplainer('exp-sdpa')">
+          <span class="etoggle-icon">&#128214;</span> Beginner Explanation &#8212; The Core Attention Formula
+          <span class="earrow">&#9660;</span>
+        </button>
+        <div class="explainer-body" id="exp-sdpa">
+          <div class="explainer-inner">
+            <h4>&#128269; The Search Engine Analogy</h4>
+            <p>Imagine you're searching YouTube. You type a <strong>Query</strong> (search term). Videos have
+              <strong>Keys</strong> (titles/tags). When your query matches a key, you get back the
+              <strong>Values</strong> (the actual video content). Attention works exactly like this!</p>
+            <ul>
+              <li><strong>Query (Q)</strong>: "What am I looking for?" — the current token asking for information.</li>
+              <li><strong>Key (K)</strong>: "What do I contain?" — what each token advertises about itself.</li>
+              <li><strong>Value (V)</strong>: "What do I contribute?" — the actual information a token provides.</li>
+            </ul>
+            <h4>&#128260; Step-by-Step</h4>
+            <p><strong>Step 1 — Dot Product Q·Kᵀ:</strong> Multiply Q by the transpose of K. High dot product = high
+              similarity = high attention score.</p>
+            <p><strong>Step 2 — Scale by √d_k:</strong> Divide by the square root of the key dimension. Without this,
+              large dot products push softmax into tiny gradients (vanishing gradient problem).</p>
+            <p><strong>Step 3 — Softmax:</strong> Convert scores to probabilities that sum to 1. Now we have attention
+              <em>weights</em>.</p>
+            <p><strong>Step 4 — Multiply by V:</strong> The output is a weighted blend of all values, where weights come
+              from how relevant each token is.</p>
+            <div class="e-eq">Attention(Q, K, V) = softmax( Q·Kᵀ / √d_k ) · V</div>
+            <div class="e-why">&#9889; Real-world example: In "The animal didn't cross the street because it was too
+              tired", attention lets the model figure out that "it" refers to "animal" by giving "animal" a high
+              attention weight when processing "it".</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+
+        <div class="card-title">
+          <div class="dot" style="background:var(--ac)"></div>Step-by-Step Walkthrough
+        </div>
+
+        <ul class="step-list" id="sdpa-steps">
+
+          <li class="sitem on">
+            <div class="snum">1</div>
+            <div class="stxt">
+              <h4>Dot Product: Q &middot; K<sup>T</sup></h4>
+              <p>Each query vector is dot-producted with every key vector to get raw similarity scores. Shape: (n
+                &times; n).</p>
+            </div>
+          </li>
+
+          <li class="sitem">
+            <div class="snum">2</div>
+            <div class="stxt">
+              <h4>Scale by &radic;d_k</h4>
+              <p>Dividing by vd_k keeps gradients stable. Without scaling, dot products grow large in high dimensions,
+                pushing softmax into saturation.</p>
+            </div>
+          </li>
+
+          <li class="sitem">
+            <div class="snum">3</div>
+            <div class="stxt">
+              <h4>Optional Mask</h4>
+              <p>In the decoder, future positions are masked with -&infin; so the model cannot "cheat" by looking ahead.
+              </p>
+            </div>
+          </li>
+
+          <li class="sitem">
+            <div class="snum">4</div>
+            <div class="stxt">
+              <h4>Softmax &#8594; Attention Weights</h4>
+              <p>Each row of scores is converted to a probability distribution. Rows sum to 1.</p>
+            </div>
+          </li>
+
+          <li class="sitem">
+            <div class="snum">5</div>
+            <div class="stxt">
+              <h4>Weighted Sum: attn &middot; V</h4>
+              <p>The output for each position is a weighted combination of all value vectors.</p>
+            </div>
+          </li>
+
+        </ul>
+
+      </div>
+
+      <div class="card">
+
+        <div class="card-title">
+          <div class="dot" style="background:var(--ac3)"></div>Formula
+        </div>
+
+        <div class="formula">Attention(<span class="hq">Q</span>, <span class="hk">K</span>, <span class="hv">V</span>)
+          = softmax<span class="ha">(</span><span class="hq">Q</span><span class="hk">K<sup>T</sup></span> /
+          &radic;d<sub>k</sub><span class="ha">)</span> &middot; <span class="hv">V</span></div>
+
+      </div>
+
+      <div class="row2">
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--q)"></div>Interactive Q&middot;K<sup>T</sup> Score Matrix
+          </div>
+
+          <div class="irow">
+
+            <input id="sdpa-sent" class="inp" style="max-width:260px" value="The cat sat" oninput="renderSDPA()" />
+
+            <div class="sl-g"><label>d_k <span class="sv" id="sdpa-dk-v">8</span></label><input type="range"
+                id="sdpa-dk" min="4" max="16" step="4" value="8"
+                oninput="document.getElementById('sdpa-dk-v').textContent=this.value;renderSDPA()" /></div>
+
+            <div class="sl-g"><label>Temp <span class="sv" id="sdpa-t-v">1.0</span></label><input type="range"
+                id="sdpa-t" min="0.1" max="3" step="0.1" value="1.0"
+                oninput="document.getElementById('sdpa-t-v').textContent=parseFloat(this.value).toFixed(1);renderSDPA()" />
+            </div>
+
+          </div>
+
+          <div id="sdpa-raw-tbl" style="overflow-x:auto"></div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--ac2)"></div>Softmax Attention Weights
+          </div>
+
+          <div id="sdpa-attn-tbl" style="overflow-x:auto"></div>
+
+          <div id="sdpa-hmap" class="hmap" style="margin-top:10px"></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+
+     SECTION 3: SINGLE-HEAD ATTENTION
+
+     ========================================================= -->
+
+    <div id="s-single" class="section">
+
+      <h2 class="sec-title">Single-Head Self-Attention <span class="badge">Live</span></h2>
+
+      <p class="sec-desc">The backbone of the Transformer. Each token creates three vectors &#8212; <span
+          style="color:var(--q)">Query</span>, <span style="color:var(--k)">Key</span>, <span
+          style="color:var(--v)">Value</span> &#8212; by projecting its embedding through learned weight matrices.</p>
+
+      <div class="explainer">
+        <button class="explainer-toggle" onclick="toggleExplainer('exp-single')">
+          <span class="etoggle-icon">&#128214;</span> Beginner Explanation &#8212; How Self-Attention Works
+          <span class="earrow">&#9660;</span>
+        </button>
+        <div class="explainer-body" id="exp-single">
+          <div class="explainer-inner">
+            <h4>&#129504; What is Self-Attention?</h4>
+            <p>In <strong>self-attention</strong>, every token in a sequence attends to every other token in the
+              <em>same</em> sequence. The "self" part means Q, K, and V all come from the same input — the sequence is
+              attending to itself.</p>
+            <h4>&#128736; The Three Weight Matrices</h4>
+            <p>Each token's embedding is multiplied by three learned matrices to create Q, K, and V vectors:</p>
+            <ul>
+              <li><code>Q = Embedding × W_Q</code> — the query projection</li>
+              <li><code>K = Embedding × W_K</code> — the key projection</li>
+              <li><code>V = Embedding × W_V</code> — the value projection</li>
+            </ul>
+            <p>These matrices are <strong>learned during training</strong> — the model figures out the best way to
+              project embeddings into Q, K, V space to solve the task.</p>
+            <div class="e-analogy">&#128161; <strong>Analogy:</strong> Imagine a dinner party. Each person (token) wears
+              a name tag (Key), thinks about what they want to talk about (Query), and has interesting things to say
+              (Value). Self-attention is like everyone simultaneously figuring out who is most interesting to talk to.
+            </div>
+            <h4>&#127775; What does the output mean?</h4>
+            <p>After attention, each token's output vector is a <strong>weighted blend</strong> of all other tokens'
+              Value vectors. Tokens that are relevant get high weights; irrelevant tokens get near-zero weights. The
+              model learns which tokens matter for each task.</p>
+            <div class="e-why">&#9889; Click any token chip above the heatmap to see exactly which tokens it attends to
+              and how strongly!</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+
+        <div class="card-title">
+          <div class="dot" style="background:var(--ac)"></div>Configuration
+        </div>
+
+        <div class="irow">
+
+          <input id="sh-sent" class="inp" style="flex:1;max-width:360px" value="The cat sat on mat" />
+
+          <button class="btn btn-p" onclick="runSH()">&#9654; Run</button>
+
+          <button class="btn btn-s" onclick="shRandom()">&#127922; Random</button>
+
+          <div class="sl-g"><label>d_model <span class="sv" id="sh-dm-v">8</span></label><input type="range" id="sh-dm"
+              min="4" max="16" step="4" value="8"
+              oninput="document.getElementById('sh-dm-v').textContent=this.value;runSH()" /></div>
+
+          <div class="sl-g"><label>Temp <span class="sv" id="sh-t-v">1.0</span></label><input type="range" id="sh-t"
+              min="0.1" max="3" step="0.1" value="1.0"
+              oninput="document.getElementById('sh-t-v').textContent=parseFloat(this.value).toFixed(1);runSH()" /></div>
+
+        </div>
+
+        <div class="tok-bar" id="sh-tokens"></div>
+
+      </div>
+
+      <div class="row3">
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--q)"></div>Q / K / V Matrices
+          </div>
+
+          <div class="tabs"><button class="tab on" onclick="shTab('q')">Q</button><button class="tab"
+              onclick="shTab('k')">K</button><button class="tab" onclick="shTab('v')">V</button></div>
+
+          <div id="sh-tpq" class="tpanel on" style="overflow-x:auto"></div>
+
+          <div id="sh-tpk" class="tpanel" style="overflow-x:auto"></div>
+
+          <div id="sh-tpv" class="tpanel" style="overflow-x:auto"></div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--ac3)"></div>Attention Heatmap
+          </div>
+
+          <div id="sh-hmap" class="hmap"></div>
+
+          <div class="legend">
+            <div class="litem">
+              <div class="ldot" style="background:rgba(124,111,255,.8)"></div>High
+            </div>
+            <div class="litem">
+              <div class="ldot" style="background:rgba(50,50,80,.4)"></div>Low
+            </div>
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--k)"></div>Score Bars &#8212; <span id="sh-sel-lbl"
+              style="color:var(--ac2);font-size:.72rem">[0]</span>
+          </div>
+
+          <div id="sh-sbars"></div>
+
+        </div>
+
+      </div>
+
+      <div class="row2">
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--ac)"></div>Attention Flow
+          </div>
+
+          <canvas id="sh-canvas" height="280"></canvas>
+
+        </div>
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--v)"></div>Output Vectors
+          </div>
+
+          <div id="sh-output"></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+
+     SECTION 4: MULTI-HEAD ATTENTION
+
+     ========================================================= -->
+
+    <div id="s-multi" class="section">
+
+      <h2 class="sec-title">Multi-Head Attention <span class="badge">Parallel Heads</span></h2>
+
+      <p class="sec-desc">Instead of one big attention, run <b>h</b> attention heads in parallel, each with d_k =
+        d_model/h. Each head learns to attend to different syntactic/semantic patterns. Concat + project at the end.</p>
+
+      <div class="explainer">
+        <button class="explainer-toggle" onclick="toggleExplainer('exp-multi')">
+          <span class="etoggle-icon">&#128214;</span> Beginner Explanation &#8212; Why Multiple Heads?
+          <span class="earrow">&#9660;</span>
+        </button>
+        <div class="explainer-body" id="exp-multi">
+          <div class="explainer-inner">
+            <h4>&#128064; One perspective vs. many perspectives</h4>
+            <p>Single-head attention can only focus on <em>one type of relationship</em> at a time. Multi-head attention
+              runs multiple attention mechanisms in parallel, letting the model capture different types of relationships
+              simultaneously.</p>
+            <div class="e-analogy">&#128161; <strong>Analogy:</strong> When analysing a sentence, you might
+              simultaneously look for: (1) grammatical subject-verb relationships, (2) pronoun references, (3)
+              sentiment-bearing words. Multi-head attention is like having a team of specialists each reading the
+              sentence for a different purpose.</div>
+            <h4>&#128296; How it works</h4>
+            <ul>
+              <li>Split <code>d_model</code> into <code>h</code> smaller subspaces of size
+                <code>d_k = d_model / h</code></li>
+              <li>Run independent attention in each subspace (<em>one "head"</em>)</li>
+              <li>Each head gets its own W_Q, W_K, W_V projection matrices</li>
+              <li>Concatenate all head outputs → shape: <code>(seq_len, h × d_k) = (seq_len, d_model)</code></li>
+              <li>Apply a final linear projection W_O to mix information across heads</li>
+            </ul>
+            <div class="e-eq">MultiHead(Q,K,V) = Concat(head_1, ..., head_h) · W_O
+              where head_i = Attention(Q·W_Qi, K·W_Ki, V·W_Vi)</div>
+            <div class="e-why">&#9889; In practice: one head might learn to track subject-verb agreement, another tracks
+              coreference ("it" → "animal"), and another captures local syntactic patterns — all simultaneously.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+
+        <div class="card-title">
+          <div class="dot" style="background:var(--ac)"></div>Configuration
+        </div>
+
+        <div class="irow">
+
+          <input id="mh-sent" class="inp" style="flex:1;max-width:360px" value="I love neural networks" />
+
+          <button class="btn btn-p" onclick="runMH()">&#9654; Run</button>
+
+          <div class="sl-g"><label>d_model <span class="sv" id="mh-dm-v">16</span></label><input type="range" id="mh-dm"
+              min="8" max="32" step="8" value="16"
+              oninput="document.getElementById('mh-dm-v').textContent=this.value;runMH()" /></div>
+
+          <div class="sl-g"><label>Heads <span class="sv" id="mh-h-v">4</span></label><input type="range" id="mh-h"
+              min="1" max="8" step="1" value="4"
+              oninput="document.getElementById('mh-h-v').textContent=this.value;runMH()" /></div>
+
+          <div class="sl-g"><label>Temp <span class="sv" id="mh-t-v">1.0</span></label><input type="range" id="mh-t"
+              min="0.1" max="3" step="0.1" value="1.0"
+              oninput="document.getElementById('mh-t-v').textContent=parseFloat(this.value).toFixed(1);runMH()" /></div>
+
+        </div>
+
+        <div class="tok-bar" id="mh-tokens"></div>
+
+      </div>
+
+      <div class="card">
+
+        <div class="card-title">
+          <div class="dot" style="background:var(--q)"></div>All Heads &#8212; Attention Heatmaps (click head to
+          inspect)
+        </div>
+
+        <div class="heads-wrap" id="mh-heads"></div>
+
+      </div>
+
+      <div class="row2">
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--ac2)"></div>Selected Head Detail &#8212; <span id="mh-sel-h"
+              style="color:var(--ac2)">Head 0</span>
+          </div>
+
+          <div id="mh-detail-hmap" class="hmap" style="margin-bottom:8px"></div>
+
+          <div id="mh-detail-sbars"></div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--ac3)"></div>Concatenated + Projected Output
+          </div>
+
+          <div class="info">MultiHead(<span class="hq">Q</span>,<span class="hk">K</span>,<span class="hv">V</span>) =
+            Concat(head<sub>1</sub>,&hellip;,head<sub>h</sub>) &middot; <strong>W_O</strong><br>Each head_i =
+            Attention(<span class="hq">Q</span>W_Qi, <span class="hk">K</span>W_Ki, <span class="hv">V</span>W_Vi)</div>
+
+          <div id="mh-output"></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+
+     SECTION 5: MASKED ATTENTION
+
+     ========================================================= -->
+
+    <div id="s-masked" class="section">
+
+      <h2 class="sec-title">Masked Self-Attention <span class="badge">Decoder</span></h2>
+
+      <p class="sec-desc">In the decoder, during training we must prevent each position from attending to future
+        positions. We apply a <b>causal mask</b> by setting future scores to -&infin; before softmax.</p>
+
+      <div class="explainer">
+        <button class="explainer-toggle" onclick="toggleExplainer('exp-masked')">
+          <span class="etoggle-icon">&#128214;</span> Beginner Explanation &#8212; Why Mask the Future?
+          <span class="earrow">&#9660;</span>
+        </button>
+        <div class="explainer-body" id="exp-masked">
+          <div class="explainer-inner">
+            <h4>&#128274; The "No Peeking" Rule</h4>
+            <p>During training, the decoder receives the <em>entire target sequence</em> at once (e.g. the full
+              translated sentence) for efficiency. But if position 3 could see position 5, the model would just copy
+              from the future — it would cheat and never learn to actually generate text!</p>
+            <p>The <strong>causal mask</strong> prevents this. It sets all scores for future positions to
+              <code>-∞</code>, which becomes <code>0</code> after softmax. Each position can only attend to itself and
+              earlier positions.</p>
+            <div class="e-analogy">&#128161; <strong>Analogy:</strong> It's like taking an exam where you can only look
+              at questions you've already answered. You can't peek at question 5 when answering question 3 — the mask
+              covers future questions with an opaque sheet.</div>
+            <h4>&#128260; Teacher Forcing</h4>
+            <p>During training, we feed the <em>ground truth</em> previous token as input (not the model's prediction).
+              This is called <strong>teacher forcing</strong>. The causal mask ensures the model still can't "cheat" by
+              seeing future ground-truth tokens.</p>
+            <p>At <strong>inference</strong> (generation time), tokens are generated one by one — so no mask is needed
+              since future tokens don't exist yet!</p>
+            <div class="e-why">&#9889; The mask is a lower-triangular matrix of 1s and 0s. Multiplying by 0 → add -∞ →
+              softmax gives 0 weight. Position i can attend to positions 0, 1, ..., i only.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+
+        <div class="card-title">
+          <div class="dot" style="background:var(--r)"></div>Live Masked Attention
+        </div>
+
+        <div class="irow">
+
+          <input id="mk-sent" class="inp" style="max-width:320px" value="I am a robot" oninput="runMasked()" />
+
+          <div class="sl-g"><label>d_model <span class="sv" id="mk-dm-v">8</span></label><input type="range" id="mk-dm"
+              min="4" max="16" step="4" value="8"
+              oninput="document.getElementById('mk-dm-v').textContent=this.value;runMasked()" /></div>
+
+        </div>
+
+        <div class="row2">
+
+          <div>
+            <div class="card-title">
+              <div class="dot" style="background:var(--r)"></div>Raw Scores (masked future = -&infin;)
+            </div>
+            <div id="mk-raw" style="overflow-x:auto"></div>
+          </div>
+
+          <div>
+            <div class="card-title">
+              <div class="dot" style="background:var(--ac2)"></div>After Softmax (causal attention)
+            </div>
+            <div id="mk-attn" style="overflow-x:auto"></div>
+          </div>
+
+        </div>
+
+        <div class="card-title" style="margin-top:12px">
+          <div class="dot" style="background:var(--ac)"></div>Causal Mask Pattern
+        </div>
+
+        <div id="mk-hmap" class="hmap"></div>
+
+        <div class="info" style="margin-top:10px"><strong>Why masking?</strong> During training we feed the full target
+          sequence at once (teacher forcing). Without masking, position 2 could see position 3 &#8212; leaking future
+          labels. At inference, tokens are generated one-by-one so no mask is needed.</div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+
+     SECTION 6: CROSS-ATTENTION
+
+     ========================================================= -->
+
+    <div id="s-cross" class="section">
+
+      <h2 class="sec-title">Cross-Attention <span class="badge">Encoder&#8594;Decoder</span></h2>
+
+      <p class="sec-desc">The decoder's second sub-layer. <b>Keys and Values come from the encoder output</b>; only
+        Queries come from the decoder. This lets each decoder position attend to all encoder positions.</p>
+
+      <div class="explainer">
+        <button class="explainer-toggle" onclick="toggleExplainer('exp-cross')">
+          <span class="etoggle-icon">&#128214;</span> Beginner Explanation &#8212; Bridging Encoder and Decoder
+          <span class="earrow">&#9660;</span>
+        </button>
+        <div class="explainer-body" id="exp-cross">
+          <div class="explainer-inner">
+            <h4>&#128279; How encoder meets decoder</h4>
+            <p>Cross-attention is what <em>connects</em> the encoder to the decoder. While self-attention looks within
+              one sequence, cross-attention lets the decoder look at the encoder's output — the full understanding of
+              the source sentence.</p>
+            <ul>
+              <li><strong>Q (Query)</strong> comes from the <em>decoder</em>: "What do I need from the source?"</li>
+              <li><strong>K, V (Key &amp; Value)</strong> come from the <em>encoder output</em>: "Here's everything I
+                know about the source."</li>
+            </ul>
+            <div class="e-analogy">&#128161; <strong>Analogy for translation ("The cat sat" → "Le chat"):</strong> When
+              generating "chat" (French for cat), the decoder's Query says "I need the noun meaning cat". It searches
+              the encoder Keys and finds "cat" has the highest match → it pulls the Value from "cat" to inform "chat".
+              This is cross-attention in one step!</div>
+            <h4>&#128203; No masking needed here</h4>
+            <p>Unlike self-attention in the decoder, cross-attention has <em>no causal mask</em>. The decoder can freely
+              look at any encoder position — the entire source sentence is always visible. Only future <em>decoder</em>
+              tokens are masked (in the self-attention sub-layer).</p>
+            <div class="e-why">&#9889; Cross-attention is what makes Transformers excellent at tasks like translation,
+              summarization, and question-answering where you need to align two different sequences.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+
+        <div class="card-title">
+          <div class="dot" style="background:var(--ac)"></div>Live Cross-Attention Demo
+        </div>
+
+        <div class="irow">
+
+          <div style="flex:1"><label style="font-size:.7rem;color:var(--mt)">Encoder (source)</label><input id="ca-enc"
+              class="inp" value="The cat sat on the mat" oninput="runCross()" /></div>
+
+          <div style="flex:1"><label style="font-size:.7rem;color:var(--mt)">Decoder (target)</label><input id="ca-dec"
+              class="inp" value="Le chat" oninput="runCross()" /></div>
+
+          <div class="sl-g"><label>d_model <span class="sv" id="ca-dm-v">8</span></label><input type="range" id="ca-dm"
+              min="4" max="16" step="4" value="8"
+              oninput="document.getElementById('ca-dm-v').textContent=this.value;runCross()" /></div>
+
+        </div>
+
+        <div class="row2">
+
+          <div>
+
+            <p style="font-size:.72rem;color:var(--mt);margin-bottom:6px">Decoder tokens (rows = Q source)</p>
+
+            <div class="tok-bar" id="ca-dec-toks"></div>
+
+          </div>
+
+          <div>
+
+            <p style="font-size:.72rem;color:var(--mt);margin-bottom:6px">Encoder tokens (cols = K/V source)</p>
+
+            <div class="tok-bar" id="ca-enc-toks"></div>
+
+          </div>
+
+        </div>
+
+        <div class="card-title" style="margin-top:12px">
+          <div class="dot" style="background:var(--ac2)"></div>Cross-Attention Heatmap (decoder rows &#8594; encoder
+          cols)
+        </div>
+
+        <div id="ca-hmap" class="hmap"></div>
+
+        <div id="ca-sbars" style="margin-top:12px"></div>
+
+      </div>
+
+      <div class="card">
+
+        <div class="info"><strong>Q</strong> = decoder hidden states ? <em>what is the decoder looking
+            for?</em><br><strong>K, V</strong> = encoder outputs ? <em>what context can the encoder
+            provide?</em><br>Result: each decoder token gets a context-aware blend of encoder information.</div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+
+     SECTION 7: FFN + LAYER NORM
+
+     ========================================================= -->
+
+    <div id="s-ffn" class="section">
+
+      <h2 class="sec-title">Feed-Forward Network <span class="badge">+ Add &amp; Norm</span></h2>
+
+      <p class="sec-desc">Each Transformer block has a two-layer FFN applied position-wise, plus residual connections
+        and Layer Normalization for stable training.</p>
+
+      <div class="explainer">
+        <button class="explainer-toggle" onclick="toggleExplainer('exp-ffn')">
+          <span class="etoggle-icon">&#128214;</span> Beginner Explanation &#8212; FFN, Residuals &amp; Layer Norm
+          <span class="earrow">&#9660;</span>
+        </button>
+        <div class="explainer-body" id="exp-ffn">
+          <div class="explainer-inner">
+            <h4>&#9881; The Feed-Forward Network</h4>
+            <p>After attention, each token's vector passes through a simple two-layer neural network — the
+              <strong>FFN</strong>. Crucially, this is applied <em>independently to each token position</em> (no
+              cross-position mixing happens here).</p>
+            <div class="e-eq">FFN(x) = max(0, x·W1 + b1) · W2 + b2
+              d_ff = 4 × d_model (e.g. 512 → 2048 → 512)</div>
+            <p>The first layer expands to a larger hidden dimension (<code>d_ff</code>), applies ReLU activation, then
+              projects back down. This gives the model nonlinear capacity to transform each token's representation.</p>
+            <h4>&#10133; Residual Connections</h4>
+            <p>Each sub-layer (attention or FFN) uses a <strong>residual connection</strong>: the output is
+              <code>LayerNorm(x + SubLayer(x))</code>. Adding the original input back lets gradients flow easily during
+              backpropagation.</p>
+            <div class="e-analogy">&#128161; <strong>Analogy:</strong> Like a highway overpass — information either goes
+              through the complex sub-layer (surface streets) OR takes the direct highway (residual path). Training can
+              learn how much to use each route.</div>
+            <h4>&#128200; Layer Normalization</h4>
+            <p>After each sub-layer, <strong>Layer Norm</strong> normalises across the feature dimension (not batch).
+              This keeps activations in a stable range and makes training much more reliable regardless of batch size.
+            </p>
+            <div class="e-eq">LayerNorm(x) = γ · (x - μ) / σ + β
+              (γ, β are learned parameters)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row2">
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--ac)"></div>FFN Architecture
+          </div>
+
+          <div class="formula">FFN(x) = max(0, x&middot;W1 + b1)&middot;W2 + b2<br><br>d_ff = 4 &times; d_model <span
+              style="color:var(--mt)">(typical)</span></div>
+
+          <div class="info">The FFN is applied <strong>independently to each position</strong>. It acts as a "per-token"
+            memory. The inner dimension d_ff is typically 4&times; larger than d_model.</div>
+
+          <div class="irow" style="margin-top:12px">
+
+            <div class="sl-g"><label>d_model <span class="sv" id="ffn-dm-v">8</span></label><input type="range"
+                id="ffn-dm" min="4" max="16" step="4" value="8"
+                oninput="document.getElementById('ffn-dm-v').textContent=this.value;runFFN()" /></div>
+
+            <div class="sl-g"><label>d_ff <span class="sv" id="ffn-ff-v">32</span></label><input type="range"
+                id="ffn-ff" min="8" max="64" step="8" value="32"
+                oninput="document.getElementById('ffn-ff-v').textContent=this.value;runFFN()" /></div>
+
+            <button class="btn btn-p" onclick="runFFN()">&#9654; Run</button>
+
+          </div>
+
+          <div id="ffn-vis"></div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--ac2)"></div>Add &amp; Layer Norm
+          </div>
+
+          <div class="formula">LayerNorm(x + Sublayer(x))<br><br>LayerNorm(x) = &gamma; &middot; (x - &mu;)/&sigma; +
+            &beta;</div>
+
+          <div class="info"><strong>Residual connection</strong> x + Sublayer(x) enables gradients to flow directly to
+            earlier layers (like ResNets).<br><br><strong>Layer Norm</strong> normalises across feature dimensions (not
+            batch), making training stable and batch-size independent.</div>
+
+          <div id="ffn-ln-vis" style="margin-top:12px"></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+
+     SECTION 8: ENCODER
+
+     ========================================================= -->
+
+    <div id="s-encoder" class="section">
+
+      <h2 class="sec-title">Encoder Block <span class="badge">Full Stack</span></h2>
+
+      <p class="sec-desc">A single Encoder layer stacks: Multi-Head Self-Attention &rarr; Add&amp;Norm &rarr; FFN &rarr;
+        Add&amp;Norm. Typically 6 layers deep (GPT-3 uses 96!).</p>
+
+      <div class="explainer">
+        <button class="explainer-toggle" onclick="toggleExplainer('exp-encoder')">
+          <span class="etoggle-icon">&#128214;</span> Beginner Explanation &#8212; The Full Encoder Layer
+          <span class="earrow">&#9660;</span>
+        </button>
+        <div class="explainer-body" id="exp-encoder">
+          <div class="explainer-inner">
+            <h4>&#128442; What does the Encoder do?</h4>
+            <p>The encoder reads the <em>entire input sequence</em> and produces a rich, contextualised representation
+              for each token. Every token can see every other token (bidirectional attention). The encoder output is
+              used by the decoder's cross-attention.</p>
+            <h4>&#128260; One Encoder Layer (in order)</h4>
+            <ul>
+              <li><strong>1. Multi-Head Self-Attention:</strong> Each token attends to all others, gathering context.
+              </li>
+              <li><strong>2. Add &amp; Norm:</strong> Residual connection + Layer Normalisation for stability.</li>
+              <li><strong>3. Feed-Forward Network:</strong> Per-token nonlinear transformation.</li>
+              <li><strong>4. Add &amp; Norm:</strong> Another residual + normalisation.</li>
+            </ul>
+            <p>This 4-step block is <strong>stacked N times</strong> (original paper: N=6). Each layer refines the
+              representations further — early layers capture syntax, later layers capture semantics.</p>
+            <div class="e-analogy">&#128161; <strong>Analogy:</strong> Like reading a book chapter multiple times. Each
+              re-read (layer) gives you a deeper understanding — first you notice individual words, then sentences, then
+              themes.</div>
+            <div class="e-why">&#9889; Famous encoders: BERT uses 12 encoder layers. RoBERTa uses 24. The encoder-only
+              design is great for understanding tasks: classification, NER, question answering.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+
+        <div class="card-title">
+          <div class="dot" style="background:var(--ac)"></div>Live Encoder
+        </div>
+
+        <div class="irow">
+
+          <input id="enc-sent" class="inp" style="flex:1;max-width:360px" value="Transformers are powerful" />
+
+          <button class="btn btn-p" onclick="runEncoder()">&#9654; Run Encoder</button>
+
+          <div class="sl-g"><label>Layers <span class="sv" id="enc-l-v">2</span></label><input type="range" id="enc-l"
+              min="1" max="4" step="1" value="2"
+              oninput="document.getElementById('enc-l-v').textContent=this.value;runEncoder()" /></div>
+
+          <div class="sl-g"><label>Heads <span class="sv" id="enc-h-v">2</span></label><input type="range" id="enc-h"
+              min="1" max="4" step="1" value="2"
+              oninput="document.getElementById('enc-h-v').textContent=this.value;runEncoder()" /></div>
+
+        </div>
+
+        <div id="enc-layer-vis"></div>
+
+      </div>
+
+      <div class="card">
+
+        <div class="card-title">
+          <div class="dot" style="background:var(--ac2)"></div>Layer-by-Layer Output Norms
+        </div>
+
+        <canvas id="enc-canvas" height="180"></canvas>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+
+     SECTION 9: DECODER
+
+     ========================================================= -->
+
+    <div id="s-decoder" class="section">
+
+      <h2 class="sec-title">Decoder Block <span class="badge">Full Stack</span></h2>
+
+      <p class="sec-desc">The Decoder has <b>3 sub-layers</b>: (1) Masked Self-Attention, (2) Cross-Attention over
+        encoder output, (3) FFN &#8212; each followed by Add&amp;Norm.</p>
+
+      <div class="explainer">
+        <button class="explainer-toggle" onclick="toggleExplainer('exp-decoder')">
+          <span class="etoggle-icon">&#128214;</span> Beginner Explanation &#8212; The Full Decoder Layer
+          <span class="earrow">&#9660;</span>
+        </button>
+        <div class="explainer-body" id="exp-decoder">
+          <div class="explainer-inner">
+            <h4>&#128452; What does the Decoder do?</h4>
+            <p>The decoder <strong>generates</strong> the output sequence token by token. It uses the encoder's output
+              to understand the source, and its own previous outputs to generate the next token.</p>
+            <h4>&#128203; One Decoder Layer (in order)</h4>
+            <ul>
+              <li><strong>1. Masked Self-Attention:</strong> Attends to previously generated tokens only (causal mask).
+                Lets the decoder build context from what it has generated so far.</li>
+              <li><strong>2. Add &amp; Norm:</strong> Residual + LayerNorm.</li>
+              <li><strong>3. Cross-Attention:</strong> Attends to the full encoder output. Lets the decoder "read" the
+                source and align it to the current generation position.</li>
+              <li><strong>4. Add &amp; Norm:</strong> Residual + LayerNorm.</li>
+              <li><strong>5. Feed-Forward Network:</strong> Per-token transformation.</li>
+              <li><strong>6. Add &amp; Norm:</strong> Final residual + LayerNorm.</li>
+            </ul>
+            <p>After N decoder layers, each token position gets a final hidden vector. This is projected through a
+              linear layer and softmax to get a probability distribution over the entire vocabulary — the model picks
+              (or samples) the next word.</p>
+            <div class="e-why">&#9889; Decoder-only models (like GPT-4, Gemini, Claude) drop the encoder entirely. They
+              use only the masked self-attention and FFN, making them ideal for open-ended text generation.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+
+        <div class="irow">
+
+          <div style="flex:1"><label style="font-size:.7rem;color:var(--mt)">Encoder context</label><input id="dec-enc"
+              class="inp" value="The cat sat on mat" /></div>
+
+          <div style="flex:1"><label style="font-size:.7rem;color:var(--mt)">Decoder sequence (so far)</label><input
+              id="dec-dec" class="inp" value="Le chat" /></div>
+
+          <button class="btn btn-p" onclick="runDecoder()">&#9654; Run</button>
+
+        </div>
+
+      </div>
+
+      <div class="row3">
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--r)"></div>1. Masked Self-Attn
+          </div>
+
+          <div id="dec-masked-hmap" class="hmap"></div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--ac)"></div>2. Cross-Attention
+          </div>
+
+          <div id="dec-cross-hmap" class="hmap"></div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--ac2)"></div>3. FFN Output
+          </div>
+
+          <div id="dec-ffn-out"></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- =========================================================
+
+     SECTION 10: TRAINING
+
+     ========================================================= -->
+
+    <div id="s-train" class="section">
+
+      <h2 class="sec-title">Training <span class="badge">Loss + Masking</span></h2>
+
+      <p class="sec-desc">Transformers are trained with cross-entropy loss on next-token prediction. Padding masks
+        prevent attending to PAD tokens; causal masks prevent future leakage.</p>
+
+      <div class="explainer">
+        <button class="explainer-toggle" onclick="toggleExplainer('exp-train')">
+          <span class="etoggle-icon">&#128214;</span> Beginner Explanation &#8212; How Transformers Learn
+          <span class="earrow">&#9660;</span>
+        </button>
+        <div class="explainer-body" id="exp-train">
+          <div class="explainer-inner">
+            <h4>&#127919; The Training Objective</h4>
+            <p>Transformers are trained to predict the <strong>next token</strong> in a sequence. Given "The cat sat on
+              the", the model should predict "mat". This is called <strong>language modelling</strong> or
+              <strong>next-token prediction</strong>.</p>
+            <h4>&#128200; Cross-Entropy Loss</h4>
+            <p>After the model outputs a probability distribution over the entire vocabulary, we compare it to the true
+              next token using <strong>cross-entropy loss</strong>. If the model assigns 90% probability to the correct
+              token, the loss is low. If it assigns 1%, the loss is very high.</p>
+            <div class="e-eq">L = -Σ y_true · log( softmax(logits) )
+              (sum over all positions in the sequence)</div>
+            <p>The loss is backpropagated through <em>all layers</em>. Gradient descent updates millions of parameters
+              (W_Q, W_K, W_V, W_O, W1, W2, embeddings...) to minimise the loss.</p>
+            <h4>&#128241; The Two Masks</h4>
+            <ul>
+              <li><strong>Padding Mask:</strong> Sequences in a batch have different lengths. Short sequences are padded
+                with a special PAD token. The padding mask sets attention scores for PAD positions to -∞ so the model
+                ignores them.</li>
+              <li><strong>Causal Mask:</strong> In the decoder, blocks future positions so the model can't cheat.</li>
+            </ul>
+            <div class="e-why">&#9889; Scale: GPT-3 was trained on 300 billion tokens with cross-entropy loss, updating
+              175 billion parameters. The same simple loss function — just applied at enormous scale — produces emergent
+              abilities like reasoning and coding.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row2">
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--ac)"></div>Cross-Entropy Loss
+          </div>
+
+          <div class="formula">L = -&Sigma; y_true &middot; log(softmax(logits))</div>
+
+          <div class="info"><strong>Teacher Forcing:</strong> during training, we always feed the ground-truth previous
+            token as decoder input &#8212; not the model's prediction. This makes training stable and fast.</div>
+
+          <div class="card-title" style="margin-top:14px">
+            <div class="dot" style="background:var(--ac2)"></div>Live Loss Explorer
+          </div>
+
+          <div class="irow">
+
+            <div class="sl-g"><label>Confidence <span class="sv" id="tr-conf-v">0.90</span></label><input type="range"
+                id="tr-conf" min="0.01" max="0.99" step="0.01" value="0.9"
+                oninput="document.getElementById('tr-conf-v').textContent=parseFloat(this.value).toFixed(2);renderLoss()" />
+            </div>
+
+          </div>
+
+          <canvas id="loss-canvas" height="160"></canvas>
+
+        </div>
+
+        <div class="card">
+
+          <div class="card-title">
+            <div class="dot" style="background:var(--r)"></div>Padding Mask vs Causal Mask
+          </div>
+
+          <div class="tabs"><button class="tab on" onclick="maskTab('pad')">Padding Mask</button><button class="tab"
+              onclick="maskTab('causal')">Causal Mask</button></div>
+
+          <div id="mask-pad" class="tpanel on">
+
+            <div class="info" style="margin-bottom:10px">PAD tokens are marked 0 in the mask. Attention to PAD positions
+              is blocked by setting scores to -&infin;.</div>
+
+            <div id="pad-hmap" class="hmap"></div>
+
+          </div>
+
+          <div id="mask-causal" class="tpanel">
+
+            <div class="info" style="margin-bottom:10px">Lower triangular mask: position i can only attend to positions
+              0&hellip;i. Future positions are blocked.</div>
+
+            <div id="causal-hmap" class="hmap"></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <div class="card-title">
+          <div class="dot" style="background:var(--ac3)"></div>Key Training Hyperparameters
+        </div>
+
+        <div class="concept-grid" id="train-concepts"></div>
+
+      </div>
+
+    </div>
+
+
+
+
+    <!-- =========================================================
+     SECTION: GLOSSARY
+     ========================================================= -->
+
+    <div id="s-glossary" class="section">
+
+      <h2 class="sec-title">Glossary <span class="badge">Key Terms</span></h2>
+
+      <p class="sec-desc">Searchable definitions for all key Transformer & machine learning terms used throughout this
+        guide.</p>
+
+      <div class="gloss-search-wrap">
+        <span class="gloss-search-icon">&#128269;</span>
+        <input class="gloss-search" id="gloss-input" type="text"
+          placeholder="Search terms... e.g. softmax, attention, embedding" oninput="filterGlossary(this.value)" />
+      </div>
+      <div class="gloss-count" id="gloss-count">Showing 25 terms</div>
+      <div class="gloss-grid" id="gloss-grid"></div>
+
+    </div>
+
+
+    <!-- =========================================================
+     SECTION: ASK A QUESTION
+     ========================================================= -->
+
+    <div id="s-qa" class="section">
+
+      <h2 class="sec-title">Ask a Question <span class="badge">&#128172;</span></h2>
+
+      <p class="sec-desc">Got a question about Transformers? Ask away — I'll reply personally to help you understand.
+      </p>
+
+      <div class="qa-hero">
+        <h3>&#128172; Have a question? I'm here to help!</h3>
+        <p>Whether you're a complete beginner or an experienced practitioner, no question is too simple or too advanced.
+          Fill in the form below and I'll get back to you.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <div class="dot" style="background:var(--ac)"></div>Your Question
+        </div>
+        <!-- TO CONFIGURE: Sign up free at https://formspree.io, create a form, and replace YOUR_FORM_ID below -->
+        <form class="qa-form" id="qa-form" onsubmit="handleQASubmit(event)">
+          <div class="qa-row">
+            <div class="qa-field">
+              <label class="qa-label" for="qa-name">Your Name</label>
+              <input class="qa-input" id="qa-name" name="name" type="text" placeholder="e.g. Arjun" required />
+            </div>
+            <div class="qa-field">
+              <label class="qa-label" for="qa-email">Your Email (so I can reply)</label>
+              <input class="qa-input" id="qa-email" name="email" type="email" placeholder="arjun@example.com"
+                required />
+            </div>
+          </div>
+          <div class="qa-field">
+            <label class="qa-label" for="qa-topic">Topic</label>
+            <select class="qa-select" id="qa-topic" name="topic">
+              <option value="Overview">Overview / General</option>
+              <option value="Embeddings">Embeddings &amp; Positional Encoding</option>
+              <option value="SDPA">Scaled Dot-Product Attention</option>
+              <option value="Single-Head">Single-Head Attention</option>
+              <option value="Multi-Head">Multi-Head Attention</option>
+              <option value="Masked">Masked Self-Attention</option>
+              <option value="Cross-Attention">Cross-Attention</option>
+              <option value="FFN">Feed-Forward Network / Layer Norm</option>
+              <option value="Encoder">Encoder Block</option>
+              <option value="Decoder">Decoder Block</option>
+              <option value="Training">Training / Loss</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="qa-field">
+            <label class="qa-label" for="qa-question">Your Question</label>
+            <textarea class="qa-textarea" id="qa-question" name="question"
+              placeholder="Type your question here... be as specific as you like! For example: 'Why do we divide by √d_k? What happens if we don't?'"
+              required></textarea>
+          </div>
+          <div>
+            <button class="qa-submit" type="submit" id="qa-submit-btn">&#128231; Send Question</button>
+            <p class="qa-note">&#128274; Your email stays private and is only used to reply to your question.</p>
+          </div>
+          <div class="qa-feedback" id="qa-feedback"></div>
+        </form>
+      </div>
+
+      <div class="qa-faq">
+        <div class="card-title" style="margin-bottom:14px">
+          <div class="dot" style="background:var(--ac3)"></div>Frequently Asked Questions
+        </div>
+
+        <div class="qa-faq-item">
+          <div class="qa-faq-q" onclick="toggleFAQ(this)">Do I need maths to understand Transformers? <span
+              class="faq-arrow">&#9660;</span></div>
+          <div class="qa-faq-a">
+            <div class="qa-faq-a-inner">Basic understanding of matrices and probability helps, but this guide is
+              designed to be beginner-friendly. The beginner explaner panels in each section give plain-English
+              intuitions before the math. Start there, then come back to the formulas once you have the intuition.</div>
+          </div>
+        </div>
+
+        <div class="qa-faq-item">
+          <div class="qa-faq-q" onclick="toggleFAQ(this)">What's the difference between BERT and GPT? <span
+              class="faq-arrow">&#9660;</span></div>
+          <div class="qa-faq-a">
+            <div class="qa-faq-a-inner">BERT is encoder-only — it reads the entire text bidirectionally (can see past
+              AND future tokens). GPT is decoder-only — it reads left-to-right (causal/autoregressive). BERT excels at
+              understanding tasks (classification, NER). GPT excels at generation tasks (writing, coding, chat).</div>
+          </div>
+        </div>
+
+        <div class="qa-faq-item">
+          <div class="qa-faq-q" onclick="toggleFAQ(this)">How long does it take to train a Transformer? <span
+              class="faq-arrow">&#9660;</span></div>
+          <div class="qa-faq-a">
+            <div class="qa-faq-a-inner">It depends enormously on model size. A tiny toy model (this demo) runs in
+              milliseconds. GPT-4 reportedly took months of training on thousands of GPUs. A small practical BERT-base
+              fine-tune on a single GPU can take hours to a few days.</div>
+          </div>
+        </div>
+
+        <div class="qa-faq-item">
+          <div class="qa-faq-q" onclick="toggleFAQ(this)">What is d_model and why does it matter? <span
+              class="faq-arrow">&#9660;</span></div>
+          <div class="qa-faq-a">
+            <div class="qa-faq-a-inner">d_model is the dimension of every token's representation throughout the
+              Transformer. A larger d_model means each token carries more information (higher capacity) but requires
+              more compute. The original paper used d_model=512. GPT-3 uses d_model=12288. All internal matrices are
+              sized relative to d_model.</div>
+          </div>
+        </div>
+
+        <div class="qa-faq-item">
+          <div class="qa-faq-q" onclick="toggleFAQ(this)">What's the difference between parameters and hyperparameters?
+            <span class="faq-arrow">&#9660;</span></div>
+          <div class="qa-faq-a">
+            <div class="qa-faq-a-inner">Parameters (like W_Q, W_K, embeddings) are the numbers the model learns during
+              training via gradient descent. Hyperparameters (like d_model, number of heads, learning rate) are choices
+              you make before training that control the model's structure and training process — they are NOT learned
+              automatically.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div><!-- /main -->
+
+  <div id="tip"></div>
+
+
+
+  <script src="app.js"></script>
+
+</body>
+
+</html>

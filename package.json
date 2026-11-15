@@ -1,0 +1,24 @@
+{
+  "name": "transformer-visual-explorer",
+  "version": "1.0.0",
+  "description": "An interactive platform to visualize and understand the internal mechanics of the Transformer architecture used in modern LLMs such as GPT and BERT.",
+  "main": "app.js",
+  "scripts": {
+    "dev": "npx serve .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pushprajgadhvi/Transformer-visual-explorer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Pushprajgadhvi/Transformer-visual-explorer/issues"
+  },
+  "homepage": "https://github.com/Pushprajgadhvi/Transformer-visual-explorer#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
